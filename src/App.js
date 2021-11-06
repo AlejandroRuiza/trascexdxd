@@ -6,7 +6,6 @@ function App() {
     const [model, setModel] = useState(null)
     const [imageURL, setImageURL] = useState(null);
     const [results, setResults] = useState([])
-    const [history, setHistory] = useState([])
 
     const imageRef = useRef()
     const textInputRef = useRef()
@@ -40,11 +39,6 @@ function App() {
         setResults(results)
     }
 
-    const handleOnChange = (e) => {
-        setImageURL(e.target.value)
-        setResults([])
-    }
-
     const triggerUpload = () => {
         fileInputRef.current.click()
     }
@@ -53,55 +47,34 @@ function App() {
         loadModel()
     }, [])
 
-    useEffect(() => {
-        if (imageURL) {
-            setHistory([imageURL, ...history])
-        }
-    }, [imageURL])
+
 
     if (isModelLoading) {
-        return <h2>Model Loading...</h2>
+        return <center><h2>Cargando..</h2></center>
     }
 
     return (
         <div className="App">
-            <h1 className='header'>Image Identification</h1>
             <div className='inputHolder'>
                 <input type='file' accept='image/*' capture='camera' className='uploadInput' onChange={uploadImage} ref={fileInputRef} />
-                <button className='uploadImage' onClick={triggerUpload}>Upload Image</button>
-                <span className='or'>OR</span>
-                <input type="text" placeholder='Paster image URL' ref={textInputRef} onChange={handleOnChange} />
+                <button className='uploadImage' onClick={triggerUpload}>Subir imagen</button>
+                <input type="hidden"  ref={textInputRef} />
             </div>
             <div className="mainWrapper">
                 <div className="mainContent">
                     <div className="imageHolder">
-                        {imageURL && <img src={imageURL} alt="Upload Preview" crossOrigin="anonymous" ref={imageRef} />}
+                        {imageURL && <img src={imageURL} crossOrigin="anonymous" ref={imageRef} />}
                     </div>
-                    {results.length > 0 && <div className='resultsHolder'>
+                    {results.length > 0 && <div>
                         {results.map((result, index) => {
                             return (
-                                <div className='result' key={result.className}>
-                                    <span className='name'>{result.className}</span>
-                                    <span className='confidence'>Confidence level: {(result.probability * 100).toFixed(2)}% {index === 0 && <span className='bestGuess'>Best Guess</span>}</span>
-                                </div>
+                                    console.log("Categoria: "+result.className+" ||Porcentaje: "+(result.probability * 100).toFixed(2))
                             )
                         })}
                     </div>}
                 </div>
-                {imageURL && <button className='button' onClick={identify}>Identify Image</button>}
+                {imageURL && <button className='button buttonSubir' onClick={identify}>Enviar</button>}
             </div>
-            {history.length > 0 && <div className="recentPredictions">
-                <h2>Recent Images</h2>
-                <div className="recentImages">
-                    {history.map((image, index) => {
-                        return (
-                            <div className="recentPrediction" key={`${image}${index}`}>
-                                <img src={image} alt='Recent Prediction' onClick={() => setImageURL(image)} />
-                            </div>
-                        )
-                    })}
-                </div>
-            </div>}
         </div>
     );
 }
